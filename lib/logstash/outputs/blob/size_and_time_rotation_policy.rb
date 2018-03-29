@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'logstash/outputs/blob/size_rotation_policy'
 require 'logstash/outputs/blob/time_rotation_policy'
 

@@ -1,4 +1,4 @@
-
+# encoding: utf-8
 require 'java'
 require 'concurrent'
 require 'concurrent/timer_task'
