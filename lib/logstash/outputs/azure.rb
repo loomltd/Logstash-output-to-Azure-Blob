@@ -52,11 +52,15 @@ require 'tmpdir'
 #        rotation_strategy_val => "size_and_time"      # optional
 #        tags => []                                    # optional
 #        encoding => "none"                            # optional
+#        codec => "plain"                              # optional
 #      }
 #    }
 class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   # name for the namespace under output for logstash configuration
   config_name 'azure'
+
+  default :codec, "line"
+  concurrency :shared
 
   require 'logstash/outputs/blob/writable_directory_validator'
   require 'logstash/outputs/blob/path_validator'
