@@ -67,7 +67,8 @@ module LogStash
           filename = "#{current_time}.#{SecureRandom.uuid}"
 
           if !tags.empty?
-            "#{filename}.tag_#{tags.join('.')}.part#{counter}.#{extension}"
+            # updating the naming format to make it easier to use databrix to read specific tags
+            "#{tags.join('.')}-#{filename}.part#{counter}.#{extension}"
           else
             "#{filename}.part#{counter}.#{extension}"
           end
