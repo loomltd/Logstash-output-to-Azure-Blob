@@ -1,7 +1,8 @@
 require 'logstash/outputs/base'
 require 'logstash/namespace'
-require 'azure'
+require "azure/storage"
 require 'tmpdir'
+require 'json'
 
 # Logstash outout plugin that uploads the logs to Azure blobs.
 # The logs are stored on local temporary file which is uploaded as a blob
@@ -40,7 +41,7 @@ require 'tmpdir'
 #      azure {
 #        storage_account_name => "my-azure-account"    # required
 #        storage_access_key => "my-super-secret-key"   # required
-#        contianer_name => "my-contianer"              # required
+#        container_name => "my-container"              # required
 #        size_file => 1024*1024*5                      # optional
 #        time_file => 10                               # optional
 #        restore => true                               # optional
@@ -92,7 +93,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   config :upload_workers_count, validate: :number, default: (Concurrent.processor_count * 0.5).ceil
   config :rotation_strategy_val, validate: %w[size_and_time size time], default: 'size_and_time'
   config :tags, validate: :array, default: []
-  config :encoding, validate: %w[none gzip], default: 'none'
+  config :encoding, validate: %w[none gzip json], default: 'none'
 
   attr_accessor :storage_account_name, :storage_access_key, :container_name,
                 :size_file, :time_file, :restore, :temporary_directory, :prefix, :upload_queue_size,
@@ -133,15 +134,14 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
 
   # Receives multiple events and check if there is space in temporary directory
   # @param events_and_encoded [Object]
-  def multi_receive_encoded(events_and_encoded)
+  def multi_receive(events)
     prefix_written_to = Set.new
-
-    events_and_encoded.each do |event, encoded|
+    
+    events.each do |event|
       prefix_key = normalize_key(event.sprintf(@prefix))
       prefix_written_to << prefix_key
-
       begin
-        @file_repository.get_file(prefix_key) { |file| file.write(encoded) }
+        @file_repository.get_file(prefix_key) { |file| file.write(JSON.generate(event)+"\n") }
         # The output should stop accepting new events coming in, since it cannot do anything with them anymore.
         # Log the error and rethrow it.
       rescue Errno::ENOSPC => e
@@ -201,9 +201,13 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   # login to azure cloud using azure gem and create the contianer if it doesn't exist
   # @return [Object] the azure_blob_service object, which is the endpoint to azure gem
   def blob_container_resource
-    Azure.config.storage_account_name = storage_account_name
-    Azure.config.storage_access_key = storage_access_key
-    azure_blob_service = Azure::Blob::BlobService.new
+    #Azure.config.storage_account_name = storage_account_name
+    #Azure.config.storage_access_key = storage_access_key
+    user_agent = 'logstash-output-azure'
+    user_agent << '/' << Gem.latest_spec_for('logstash-output-azure').version.to_s
+    client = Azure::Storage::Client.create(:storage_account_name => storage_account_name, :storage_access_key => storage_access_key, :storage_blob_host => "https://#{@storage_account_name}.blob.core.windows.net", :user_agent_prefix => user_agent)
+    #azure_blob_service = Azure::Storage::Blob::BlobService.new(client)
+    azure_blob_service = client.blob_client
     list = azure_blob_service.list_containers
     list.each do |item|
       @container = item if item.name == container_name
@@ -239,7 +243,9 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   # uploads the file using the +Uploader+
   def upload_file(temp_file)
     @logger.debug('Queue for upload', path: temp_file.path)
-
+    
+    # defaulting upload options
+    upload_options={'queue_size' => @upload_queue_size, "workers_count" => @upload_workers_count}
     # if the queue is full the calling thread will be used to upload
     temp_file.close # make sure the content is on disk
     unless temp_file.empty? # rubocop:disable GuardClause
@@ -271,6 +277,8 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   def restore_from_crash
     @crash_uploader = Uploader.new(blob_container_resource, container_name, @logger, CRASH_RECOVERY_THREADPOOL)
 
+    # defaulting upload options
+    upload_options={}
     temp_folder_path = Pathname.new(@temporary_directory)
     Dir.glob(::File.join(@temporary_directory, '**/*'))
        .select { |file| ::File.file?(file) }

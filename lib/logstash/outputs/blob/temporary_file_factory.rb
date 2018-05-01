@@ -13,7 +13,7 @@ module LogStash
         FILE_MODE = 'a'.freeze
         GZIP_ENCODING = 'gzip'.freeze
         GZIP_EXTENSION = 'txt.gz'.freeze
-        TXT_EXTENSION = 'txt'.freeze
+        TXT_EXTENSION = 'json'.freeze
         STRFTIME = '%Y-%m-%dT%H.%M'.freeze
 
         attr_accessor :counter, :tags, :prefix, :encoding, :temporary_directory, :current

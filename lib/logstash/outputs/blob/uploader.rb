@@ -1,6 +1,6 @@
 require 'logstash/util'
-require 'azure'
-
+#require 'azure'
+require "azure/storage"
 module LogStash
   module Outputs
     class LogstashAzureBlobOutput
@@ -34,15 +34,49 @@ module LogStash
         end
 
         # Uploads the file to the container
+      #  def upload(file, options = {})
+      #    upload_options = options.fetch(:upload_options, {})#
+
+      #    begin
+      #      content = Object::File.open(file.path, 'rb').read
+      #      filename = Object::File.basename file.path
+      #      puts filename
+      #      blob = blob_account.create_block_blob(container_name, filename, content)
+      #      puts blob.name
+      #    rescue => e
+      #      # When we get here it usually mean that LogstashAzureBlobOutput tried to do some retry by himself (default is 3)
+      #      # When the retry limit is reached or another error happen we will wait and retry.
+      #      #
+      #      # Thread might be stuck here, but I think its better than losing anything
+      #      # its either a transient errors or something bad really happened.
+      #      logger.error('Uploading failed, retrying', exception: e.class, message: e.message, path: file.path, backtrace: e.backtrace)
+      #      retry
+      #    end
+
         def upload(file, options = {})
           upload_options = options.fetch(:upload_options, {})
 
           begin
-            content = Object::File.open(file.path, 'rb').read
             filename = Object::File.basename file.path
             puts filename
-            blob = blob_account.create_block_blob(container_name, filename, content)
-            puts blob.name
+            block_size = 33554432
+            blocks = []
+            Object::File.open(file.path, 'rb') do |file|
+              while (file_bytes = file.read(block_size))
+
+                block_id = Base64.strict_encode64((0...8).map { ('a'..'z').to_a[rand(26)] }.join)
+                blob_account.put_blob_block(container_name, filename, block_id, file_bytes)
+        
+                blocks << [block_id]
+              end
+            end
+            # comitting the containers
+            blob = blob_account.commit_blob_blocks(container_name, filename, blocks)
+
+            #blob = blob_account.create_block_blob(container_name, filename, content)
+            list_blocks = blob_account.list_blob_blocks(container_name, filename)
+            list_blocks[:committed].each { |block| puts "Block #{block.name}" }
+        
           rescue => e
             # When we get here it usually mean that LogstashAzureBlobOutput tried to do some retry by himself (default is 3)
             # When the retry limit is reached or another error happen we will wait and retry.
