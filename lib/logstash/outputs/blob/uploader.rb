@@ -1,5 +1,4 @@
 require 'logstash/util'
-#require 'azure'
 require "azure/storage"
 module LogStash
   module Outputs

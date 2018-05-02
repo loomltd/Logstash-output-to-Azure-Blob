@@ -1,7 +1,7 @@
 require 'logstash/devutils/rspec/spec_helper'
 require 'logstash/outputs/blob/uploader'
 require 'logstash/outputs/blob/temporary_file'
-require 'azure'
+require "azure/storage"
 require 'stud/temporary'
 
 describe LogStash::Outputs::LogstashAzureBlobOutput::Uploader do
