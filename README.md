@@ -49,8 +49,8 @@ bundle exec rspec
 #### 2.1 Run in a local Logstash clone
 
 - Edit Logstash `Gemfile` and add the local plugin path, for example:
-```ruby
-gem "logstash-filter-awesome", :path => "/your/local/logstash-filter-awesome"
+```rubyfilter
+gem "logstash--awesome", :path => "/your/local/logstash-filter-awesome"
 ```
 - Install plugin
 ```sh
