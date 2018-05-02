@@ -61,7 +61,7 @@ describe LogStash::Outputs::LogstashAzureBlobOutput::TemporaryFileFactory do
       let(:tags) { %w[secret service] }
 
       it 'adds tags to the filename' do
-        expect(subject.current.path).to match(/^#{tags.join('.')}-/)
+        expect(subject.current.path).to match(/\/#{tags.join('.')}-/)
       end
     end
 
