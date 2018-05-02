@@ -23,7 +23,7 @@ sudo systemctl restart logstash
 ```
 ### How to use the plugin:
 Use this output in the pipelines where you need to output to blob. 
-
+```
 output {
      azure {
         storage_account_name => "my-azure-account"    # required
@@ -41,3 +41,4 @@ output {
         encoding => "none"                            # optional (none or gzip) - the none will output as json lines
       }
     }
+```
