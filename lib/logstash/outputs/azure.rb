@@ -245,7 +245,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
     @logger.debug('Queue for upload', path: temp_file.path)
     
     # defaulting upload options
-    upload_options={'queue_size' => @upload_queue_size, "workers_count" => @upload_workers_count}
+    upload_options = {}
     # if the queue is full the calling thread will be used to upload
     temp_file.close # make sure the content is on disk
     unless temp_file.empty? # rubocop:disable GuardClause
