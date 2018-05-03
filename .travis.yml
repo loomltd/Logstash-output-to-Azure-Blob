@@ -5,12 +5,6 @@ install: gem install bundler
 script:
 - bundle install --quiet
 - bundle exec rspec
-deploy:
-  provider: rubygems
-  gem: logstash-output-azure
-  gemspec: logstash-output-azure.gemspec
-  on:
-    branch: master
 
 notifications:
   email: false

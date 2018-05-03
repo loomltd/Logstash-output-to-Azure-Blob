@@ -17,11 +17,12 @@ module LogStash
         # Initializes the class
         # @param blob_account [Object] endpoint to azure gem
         # @param container_name [String] name of the container in azure blob, at this point, if it doesn't exist, it was already created
-        def initialize(blob_account, container_name, logger, threadpool = DEFAULT_THREADPOOL)
+        def initialize(blob_account, container_name, storage_location, logger, threadpool = DEFAULT_THREADPOOL)
           @blob_account = blob_account
           @workers_pool = threadpool
           @logger = logger
           @container_name = container_name
+          @storage_location = storage_location
         end
 
         # Create threads to upload the file to the container
@@ -37,11 +38,12 @@ module LogStash
 
           begin
             filename = Object::File.basename file.path
-            puts filename
-            if :upload_options[:storage_location]
+            if @storage_location
               # prepending the storage location if we have one
-              filename = :upload_options[:storage_location]+'/'+filename
+              filename = @storage_location + '/' + filename
             end
+            puts filename
+
             block_size = 33554432
             blocks = []
             Object::File.open(file.path, 'rb') do |file|

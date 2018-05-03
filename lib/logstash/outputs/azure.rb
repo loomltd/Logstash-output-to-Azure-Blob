@@ -85,7 +85,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   config :container_name, validate: :string, required: false
 
   # storage_location
-  config :storage_location, validate: :string, default: "logstash/"
+  config :storage_location, validate: :string, default: 'logstash'
 
   # mamadas
   config :size_file, validate: :number, default: 1024 * 1024 * 5
@@ -130,7 +130,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
                                                   max_queue: @upload_queue_size,
                                                   fallback_policy: :caller_runs)
 
-    @uploader = Uploader.new(blob_container_resource, container_name, @logger, executor)
+    @uploader = Uploader.new(blob_container_resource, container_name, storage_location, @logger, executor)
 
     restore_from_crash if @restore
     start_periodic_check if @rotation.needs_periodic?
@@ -249,7 +249,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
     @logger.debug('Queue for upload', path: temp_file.path)
     
     # defaulting upload options
-    upload_options = {:storage_location => @storage_location}
+    upload_options = {}
     # if the queue is full the calling thread will be used to upload
     temp_file.close # make sure the content is on disk
     unless temp_file.empty? # rubocop:disable GuardClause
@@ -279,7 +279,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
 
   # uploads files if there was a crash before
   def restore_from_crash
-    @crash_uploader = Uploader.new(blob_container_resource, container_name, @logger, CRASH_RECOVERY_THREADPOOL)
+    @crash_uploader = Uploader.new(blob_container_resource, container_name, storage_location, @logger, CRASH_RECOVERY_THREADPOOL)
 
     # defaulting upload options
     upload_options={}
