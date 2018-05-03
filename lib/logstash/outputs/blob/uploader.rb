@@ -38,6 +38,10 @@ module LogStash
           begin
             filename = Object::File.basename file.path
             puts filename
+            if :upload_options[:storage_location]
+              # prepending the storage location if we have one
+              filename = :upload_options[:storage_location]+'/'+filename
+            end
             block_size = 33554432
             blocks = []
             Object::File.open(file.path, 'rb') do |file|

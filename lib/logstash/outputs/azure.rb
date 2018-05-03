@@ -42,6 +42,7 @@ require 'json'
 #        storage_account_name => "my-azure-account"    # required
 #        storage_access_key => "my-super-secret-key"   # required
 #        container_name => "my-container"              # required
+#        storage_location => "path/in/blob"            # optional
 #        size_file => 1024*1024*5                      # optional
 #        time_file => 10                               # optional
 #        restore => true                               # optional
@@ -83,6 +84,9 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   # conatainer name
   config :container_name, validate: :string, required: false
 
+  # storage_location
+  config :storage_location, validate: :string, default: "logstash/"
+
   # mamadas
   config :size_file, validate: :number, default: 1024 * 1024 * 5
   config :time_file, validate: :number, default: 15
@@ -95,7 +99,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   config :tags, validate: :array, default: []
   config :encoding, validate: %w[none gzip json], default: 'none'
 
-  attr_accessor :storage_account_name, :storage_access_key, :container_name,
+  attr_accessor :storage_account_name, :storage_access_key, :container_name, storage_location
                 :size_file, :time_file, :restore, :temporary_directory, :prefix, :upload_queue_size,
                 :upload_workers_count, :rotation_strategy_val, :tags, :encoding
 
@@ -245,7 +249,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
     @logger.debug('Queue for upload', path: temp_file.path)
     
     # defaulting upload options
-    upload_options = {}
+    upload_options = {:storage_location => @storage_location}
     # if the queue is full the calling thread will be used to upload
     temp_file.close # make sure the content is on disk
     unless temp_file.empty? # rubocop:disable GuardClause
