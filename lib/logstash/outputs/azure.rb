@@ -99,7 +99,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   config :tags, validate: :array, default: []
   config :encoding, validate: %w[none gzip json], default: 'none'
 
-  attr_accessor :storage_account_name, :storage_access_key, :container_name, :storage_location
+  attr_accessor :storage_account_name, :storage_access_key, :container_name, :storage_location,
                 :size_file, :time_file, :restore, :temporary_directory, :prefix, :upload_queue_size,
                 :upload_workers_count, :rotation_strategy_val, :tags, :encoding
 
