@@ -29,6 +29,7 @@ output {
         storage_account_name => "my-azure-account"    # required
         storage_access_key => "my-super-secret-key"   # required
         container_name => "my-container"              # required
+        storage_path => "path/on/the/blob/store"      # optional
         size_file => 1024*1024*5                      # optional - size in bytes - keep in mind the size of the temp folder
         time_file => 10                               # optional
         restore => true                               # optional
