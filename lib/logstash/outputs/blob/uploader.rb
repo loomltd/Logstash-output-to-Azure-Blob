@@ -40,7 +40,7 @@ module LogStash
             filename = Object::File.basename file.path
             if @storage_location
               # prepending the storage location if we have one - and adding a datestamp for better analytics precision
-              filename = @storage_location + '/' + Time.now.strftime('%Y-%M-%d') +'/' + filename
+              filename = @storage_location + '/' + Time.now.strftime('%Y-%m-%d') +'/' + filename
             end
             puts filename
 
