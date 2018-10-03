@@ -1,87 +1,45 @@
 # Logstash Plugin
-[![Build Status](https://travis-ci.org/tuffk/Logstash-output-to-Azure-Blob.svg?branch=master)](https://travis-ci.org/tuffk/Logstash-output-to-Azure-Blob)
+[![Build Status](https://travis-ci.org/paulpc/Logstash-output-to-Azure-Blob.svg?branch=master)](https://travis-ci.org/paulpc/Logstash-output-to-Azure-Blob)
 
 This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
 It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way.
 
+This plugin has been forked and modified from [tuffk/Logstash-output-to-Azure-Blob](https://github.com/tuffk/Logstash-output-to-Azure-Blob)
 ## Documentation
 
-Logstash provides infrastructure to automatically generate documentation for this plugin. We use the asciidoc format to write documentation so any comments in the source code will be first converted into asciidoc and then into html. All plugin documentation are placed under one [central location](http://www.elastic.co/guide/en/logstash/current/).
-
-- For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
-- For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
-
-## Need Help?
-
-Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
-
-## Developing
-
-### 1. Plugin Developement and Testing
-
-#### Code
-- To get started, you'll need JRuby with the Bundler gem installed.
-
-- Create a new plugin or clone and existing from the GitHub [logstash-plugins](https://github.com/logstash-plugins) organization. We also provide [example plugins](https://github.com/logstash-plugins?query=example).
-
-- Install dependencies
+### How to install the plugin
+- create the gem file
 ```sh
-bundle install
-```
-
-#### Test
-
-- Update your dependencies
-
-```sh
-bundle install
-```
-
-- Run tests
-
-```sh
-bundle exec rspec
-```
-
-### 2. Running your unpublished Plugin in Logstash
-
-#### 2.1 Run in a local Logstash clone
-
-- Edit Logstash `Gemfile` and add the local plugin path, for example:
-```ruby
-gem "logstash-filter-awesome", :path => "/your/local/logstash-filter-awesome"
+gem build logstash-output-azure.gemspec
 ```
 - Install plugin
 ```sh
-bin/logstash-plugin install --no-verify
+sudo /usr/share/logstash/bin/logstash-plugin install --no-verify /path/to/gem/file/logstash-output-azure-[version].gem
 ```
-- Run Logstash with your plugin
+- Restart Logstash and proceed to test the plugin
 ```sh
-bin/logstash -e 'filter {awesome {}}'
+sudo systemctl restart logstash
 ```
-At this point any modifications to the plugin code will be applied to this local Logstash setup. After modifying the plugin, simply rerun Logstash.
-
-#### 2.2 Run in an installed Logstash
-
-You can use the same **2.1** method to run your plugin in an installed Logstash by editing its `Gemfile` and pointing the `:path` to your local plugin development directory or you can build the gem and install it using:
-
-- Build your plugin gem
-```sh
-gem build logstash-filter-awesome.gemspec
+### How to use the plugin:
+Use this output in the pipelines where you need to output to blob.
 ```
-- Install the plugin from the Logstash home
-```sh
-bin/logstash-plugin install /your/local/plugin/logstash-filter-awesome.gem
+output {
+     azure {
+        storage_account_name => "my-azure-account"    # required
+        storage_access_key => "my-super-secret-key"   # required
+        container_name => "my-container"              # required
+        prefix => "a_prefix"                          # required - unique across pipelines
+        storage_path => "path/on/the/blob/store"      # optional
+        size_file => 1024*1024*5                      # optional - size in bytes - keep in mind the size of the temp folder
+        time_file => 10                               # optional
+        restore => true                               # optional
+        temporary_directory => "path/to/directory"    # optional
+        upload_queue_size => 2                        # optional
+        upload_workers_count => 1                     # optional
+        rotation_strategy_val => "size_and_time"      # optional
+        tags => []                                    # optional - will be used in the begining of the file name
+        encoding => "none"                            # optional (none or gzip) - the none will output as json lines
+      }
+    }
 ```
-- Start Logstash and proceed to test the plugin
-
-## Contributing
-
-All contributions are welcome: ideas, patches, documentation, bug reports, complaints, and even something you drew up on a napkin.
-
-Programming is not a required skill. Whatever you've seen about open source and maintainers or community members  saying "send patches or die" - you will not see that here.
-
-It is more important to the community that you are able to contribute.
-
-For more information about contributing, see the [CONTRIBUTING](https://github.com/elastic/logstash/blob/master/CONTRIBUTING.md) file.
