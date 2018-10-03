@@ -36,6 +36,8 @@ require 'tmpdir'
 #   tags for the files
 # @!attribute encoding
 #   the encoding of the files
+# @!attribute codec
+#   the codec of the files - e.g. json or unformattet plain log lines
 # @example basic configuration
 #    output {
 #      azure {
@@ -52,14 +54,14 @@ require 'tmpdir'
 #        rotation_strategy_val => "size_and_time"      # optional
 #        tags => []                                    # optional
 #        encoding => "none"                            # optional
-#        codec => "plain"                              # optional
+#        codec => "json"                               # optional
 #      }
 #    }
 class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   # name for the namespace under output for logstash configuration
   config_name 'azure'
 
-  default :codec, "line"
+  default :codec, "json"
   concurrency :shared
 
   require 'logstash/outputs/blob/writable_directory_validator'
