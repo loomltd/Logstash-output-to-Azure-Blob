@@ -54,14 +54,14 @@ require 'tmpdir'
 #        rotation_strategy_val => "size_and_time"      # optional
 #        tags => []                                    # optional
 #        encoding => "none"                            # optional
-#        codec => "json"                               # optional
+#        codec => "json_lines"                         # optional
 #      }
 #    }
 class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
   # name for the namespace under output for logstash configuration
   config_name 'azure'
 
-  default :codec, "json"
+  default :codec, "json_lines"
   concurrency :shared
 
   require 'logstash/outputs/blob/writable_directory_validator'
