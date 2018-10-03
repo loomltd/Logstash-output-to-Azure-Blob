@@ -5,7 +5,7 @@ This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
 It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way.
 
-This plugin has been forked and modified from [tuffk/Logstash-output-to-Azure-Blob](https://github.com/tuffk/Logstash-output-to-Azure-Blob)
+This plugin has been forked and modified from [tuffk/Logstash-output-to-Azure-Blob](https://github.com/tuffk/Logstash-output-to-Azure-Blob) through [loomltd](https://github.com/loomltd/logstash-output-to-azure-blob)
 ## Documentation
 
 ### How to install the plugin
@@ -40,6 +40,7 @@ output {
         rotation_strategy_val => "size_and_time"      # optional
         tags => []                                    # optional - will be used in the begining of the file name
         encoding => "none"                            # optional (none or gzip) - the none will output as json lines
+        codec => "json_lines"                         # optional - the codec of the files - e.g. json_lines or unformattet plain log lines
       }
     }
 ```
