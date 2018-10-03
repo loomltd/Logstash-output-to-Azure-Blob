@@ -37,7 +37,7 @@ require 'tmpdir'
 # @!attribute encoding
 #   the encoding of the files
 # @!attribute codec
-#   the codec of the files - e.g. json or unformattet plain log lines
+#   the codec of the files - e.g. json_lines or unformattet plain log lines
 # @example basic configuration
 #    output {
 #      azure {
