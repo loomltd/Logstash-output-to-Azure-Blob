@@ -65,7 +65,7 @@ module LogStash
 
         # method that generate the name of the file to be saved in blob storage
         def generate_name
-          filename = "#{current_time}.#{SecureRandom.uuid}"
+          filename = "#{prefix}.#{current_time}.#{SecureRandom.uuid}"
 
           if !tags.empty?
             "#{filename}.tag_#{tags.join('.')}.part#{counter}.#{extension}"
@@ -77,11 +77,10 @@ module LogStash
         # create the file to be saved in blob storage
         def new_file
           uuid = SecureRandom.uuid
-          name = generate_name
-          path = ::File.join(temporary_directory, uuid)
-          key = ::File.join(prefix, name)
+          key = generate_name
+          path = ::File.join(temporary_directory, prefix)
 
-          FileUtils.mkdir_p(::File.join(path, prefix))
+          FileUtils.mkdir_p(path)
 
           io = if gzip?
                  # We have to use this wrapper because we cannot access the size of the

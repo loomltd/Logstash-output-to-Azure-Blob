@@ -16,6 +16,8 @@ require 'tmpdir'
 #   Azure storage account access key (required) - found under the access keys tab
 # @!attribute contianer_name
 #   Blob container to uplaod blobs to (required)
+# @!attribute prefix
+#   prefix for the files to be uploaded, must be unique across pipelines (required)
 # @!attribute size_file
 #   File size to use for local tmeporary File
 # @!attribute time_file
@@ -24,8 +26,6 @@ require 'tmpdir'
 #   restore after crash
 # @!attribute temporary_directory
 #   temporary directory where the temporary files will be written
-# @!attribute prefix
-#   prefix for the files to be uploaded
 # @!attribute upload queue size
 #   upload que size
 # @!attribute upload workers count
@@ -42,11 +42,11 @@ require 'tmpdir'
 #        storage_account_name => "my-azure-account"    # required
 #        storage_access_key => "my-super-secret-key"   # required
 #        contianer_name => "my-contianer"              # required
+#        prefix => "a_prefix"                          # required
 #        size_file => 1024*1024*5                      # optional
 #        time_file => 10                               # optional
 #        restore => true                               # optional
 #        temporary_directory => "path/to/directory"    # optional
-#        prefix => "a_prefix"                          # optional
 #        upload_queue_size => 2                        # optional
 #        upload_workers_count => 1                     # optional
 #        rotation_strategy_val => "size_and_time"      # optional
@@ -79,20 +79,22 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
                                                                  fallback_policy: :caller_runs)
 
   # azure contianer
-  config :storage_account_name, validate: :string, required: false
+  config :storage_account_name, validate: :string, required: true
 
   # azure key
-  config :storage_access_key, validate: :string, required: false
+  config :storage_access_key, validate: :string, required: true
 
   # conatainer name
-  config :container_name, validate: :string, required: false
+  config :container_name, validate: :string, required: true
+
+  # prefix name
+  config :prefix, validate: :string, required: true
 
   # mamadas
   config :size_file, validate: :number, default: 1024 * 1024 * 5
   config :time_file, validate: :number, default: 15
   config :restore, validate: :boolean, default: true
   config :temporary_directory, validate: :string, default: File.join(Dir.tmpdir, 'logstash')
-  config :prefix, validate: :string, default: ''
   config :upload_queue_size, validate: :number, default: 2 * (Concurrent.processor_count * 0.25).ceil
   config :upload_workers_count, validate: :number, default: (Concurrent.processor_count * 0.5).ceil
   config :rotation_strategy_val, validate: %w[size_and_time size time], default: 'size_and_time'
@@ -278,7 +280,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
     @crash_uploader = Uploader.new(blob_container_resource, container_name, @logger, CRASH_RECOVERY_THREADPOOL)
 
     temp_folder_path = Pathname.new(@temporary_directory)
-    Dir.glob(::File.join(@temporary_directory, '**/*'))
+    Dir.glob(::File.join(@temporary_directory, prefix, '*'))
        .select { |file| ::File.file?(file) }
        .each do |file|
       temp_file = TemporaryFile.create_from_existing_file(file, temp_folder_path)
