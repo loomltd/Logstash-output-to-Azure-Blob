@@ -47,17 +47,16 @@ module LogStash
           @key.gsub(/^\//, '')
         end
 
-        # Each temporary file is made inside a directory named with an UUID,
-        # instead of deleting the file directly and having the risk of deleting other files
-        # we delete the root of the UUID, using a UUID also remove the risk of deleting unwanted file, it acts as
-        # a sandbox.
+        # Delete the file, if it exists
         def delete!
           begin
             @fd.close
           rescue
             IOError
           end
-          FileUtils.rm_r(@temp_path, secure: true)
+          if temp_file.exists?
+            FileUtils.rm_r(@temp_path, secure: true)
+          end
         end
 
         # boolean method to determine if the file is empty
