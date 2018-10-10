@@ -66,7 +66,7 @@ module LogStash
         end
 
         def exists?
-          File.exists?(@temp_path)
+          ::File.exists?(@temp_path)
         end
 
         # creates the temporary file in an existing temporary directory from existing file
