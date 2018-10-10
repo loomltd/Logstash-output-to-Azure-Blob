@@ -251,7 +251,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
 
     # if the queue is full the calling thread will be used to upload
     temp_file.close # make sure the content is on disk
-    unless temp_file.empty? # rubocop:disable GuardClause
+    if temp_file.exists? && !temp_file.empty? # rubocop:disable GuardClause
       upload_options = []
       @uploader.upload_async(temp_file,
                              on_complete: method(:clean_temporary_file),

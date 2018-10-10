@@ -37,7 +37,6 @@ module LogStash
           # Use the fd size to get the accurate result,
           # so we dont have to deal with fsync
           # if the file is close we will use the File::size
-
           @fd.size
         rescue IOError
           ::File.size(path)
@@ -64,6 +63,10 @@ module LogStash
         # boolean method to determine if the file is empty
         def empty?
           size.zero?
+        end
+
+        def exists?
+          File.exists?(@temp_path)
         end
 
         # creates the temporary file in an existing temporary directory from existing file
