@@ -54,7 +54,7 @@ module LogStash
           rescue
             IOError
           end
-          if temp_file.exists?
+          if exists?
             FileUtils.rm_r(@temp_path, secure: true)
           end
         end
