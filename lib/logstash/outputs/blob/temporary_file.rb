@@ -55,7 +55,7 @@ module LogStash
             IOError
           end
           if exists?
-            FileUtils.rm_r(@temp_path, secure: true)
+            FileUtils.rm_r(::File.join([@temp_path, @key]), secure: true)
           end
         end
 
