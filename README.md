@@ -26,21 +26,21 @@ Use this output in the pipelines where you need to output to blob.
 ```
 output {
      azure {
-        storage_account_name => "my-azure-account"    # required
-        storage_access_key => "my-super-secret-key"   # required
-        container_name => "my-container"              # required
-        prefix => "a_prefix"                          # required - unique across pipelines
-        storage_path => "path/on/the/blob/store"      # optional
-        size_file => 1024*1024*5                      # optional - size in bytes - keep in mind the size of the temp folder
-        time_file => 10                               # optional
-        restore => true                               # optional
-        temporary_directory => "path/to/directory"    # optional
-        upload_queue_size => 2                        # optional
-        upload_workers_count => 1                     # optional
-        rotation_strategy_val => "size_and_time"      # optional
-        tags => []                                    # optional - will be used in the begining of the file name
-        encoding => "none"                            # optional (none or gzip) - the none will output as json lines
-        codec => "json_lines"                         # optional - the codec of the files - e.g. json_lines or unformattet plain log lines
+        storage_account_name => "my-azure-account"      # required
+        storage_access_key => "my-super-secret-key"     # required
+        container_name => "my-container"                # required
+        prefix => "a_prefix"                            # required
+        storage_path => "path/on/the/blob/store"        # optional
+        size_file => 1024*1024*5                        # optional - size in bytes - keep in mind the size of the temp folder
+        time_file => 10                                 # optional
+        restore => true                                 # optional
+        temporary_directory => "/directory/pipeline_id" # optional - unique across pipelines
+        upload_queue_size => 2                          # optional
+        upload_workers_count => 1                       # optional
+        rotation_strategy_val => "size_and_time"        # optional
+        tags => []                                      # optional - will be used in the begining of the file name
+        encoding => "none"                              # optional (none or gzip) - the none will output as json lines
+        codec => "json_lines"                           # optional - the codec of the files - e.g. json_lines or unformattet plain log lines
       }
     }
 ```
