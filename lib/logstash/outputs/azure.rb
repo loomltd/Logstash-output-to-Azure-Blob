@@ -41,20 +41,20 @@ require 'tmpdir'
 # @example basic configuration
 #    output {
 #      azure {
-#        storage_account_name => "my-azure-account"    # required
-#        storage_access_key => "my-super-secret-key"   # required
-#        contianer_name => "my-contianer"              # required
-#        prefix => "a_prefix"                          # required
-#        size_file => 1024*1024*5                      # optional
-#        time_file => 10                               # optional
-#        restore => true                               # optional
-#        temporary_directory => "path/to/directory"    # optional
-#        upload_queue_size => 2                        # optional
-#        upload_workers_count => 1                     # optional
-#        rotation_strategy_val => "size_and_time"      # optional
-#        tags => []                                    # optional
-#        encoding => "none"                            # optional
-#        codec => "json_lines"                         # optional
+#        storage_account_name => "my-azure-account"      # required
+#        storage_access_key => "my-super-secret-key"     # required
+#        contianer_name => "my-contianer"                # required
+#        prefix => "a_prefix"                            # required
+#        size_file => 1024*1024*5                        # optional
+#        time_file => 10                                 # optional
+#        restore => true                                 # optional
+#        temporary_directory => "/directory/pipeline_id" # optional - unique across pipelines
+#        upload_queue_size => 2                          # optional
+#        upload_workers_count => 1                       # optional
+#        rotation_strategy_val => "size_and_time"        # optional
+#        tags => []                                      # optional
+#        encoding => "none"                              # optional
+#        codec => "json_lines"                           # optional
 #      }
 #    }
 class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
