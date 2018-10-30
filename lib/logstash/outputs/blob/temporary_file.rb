@@ -49,23 +49,13 @@ module LogStash
 
         # Delete the file, if it exists
         def delete!
-          begin
-            @fd.close
-          rescue
-            IOError
-          end
-          if exists?
-            FileUtils.rm_r(::File.join([@temp_path, @key]), secure: true)
-          end
+          @fd.close rescue IOError
+          FileUtils.rm_r(@temp_path, secure: true)
         end
 
         # boolean method to determine if the file is empty
         def empty?
           size.zero?
-        end
-
-        def exists?
-          ::File.exists?(@temp_path)
         end
 
         # creates the temporary file in an existing temporary directory from existing file

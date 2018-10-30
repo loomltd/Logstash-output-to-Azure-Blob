@@ -41,9 +41,7 @@ module LogStash
           begin
             content = Object::File.open(file.path, 'rb').read
             filename = Object::File.basename file.path
-            puts filename
             blob = blob_account.create_block_blob(container_name, filename, content)
-            puts blob.name
           rescue => e
             # When we get here it usually mean that LogstashAzureBlobOutput tried to do some retry by himself (default is 3)
             # When the retry limit is reached or another error happen we will wait and retry.
@@ -51,6 +49,7 @@ module LogStash
             # Thread might be stuck here, but I think its better than losing anything
             # its either a transient errors or something bad really happened.
             logger.error('Uploading failed, retrying', exception: e.class, message: e.message, path: file.path, backtrace: e.backtrace)
+            sleep TIME_BEFORE_RETRYING_SECONDS
             retry
           end
 

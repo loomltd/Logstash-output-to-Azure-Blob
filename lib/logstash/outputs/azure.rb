@@ -41,20 +41,20 @@ require 'tmpdir'
 # @example basic configuration
 #    output {
 #      azure {
-#        storage_account_name => "my-azure-account"    # required
-#        storage_access_key => "my-super-secret-key"   # required
-#        contianer_name => "my-contianer"              # required
-#        prefix => "a_prefix"                          # required
-#        size_file => 1024*1024*5                      # optional
-#        time_file => 10                               # optional
-#        restore => true                               # optional
-#        temporary_directory => "path/to/directory"    # optional
-#        upload_queue_size => 2                        # optional
-#        upload_workers_count => 1                     # optional
-#        rotation_strategy_val => "size_and_time"      # optional
-#        tags => []                                    # optional
-#        encoding => "none"                            # optional
-#        codec => "json_lines"                         # optional
+#        storage_account_name => "my-azure-account"      # required
+#        storage_access_key => "my-super-secret-key"     # required
+#        contianer_name => "my-contianer"                # required
+#        prefix => "a_prefix"                            # required
+#        size_file => 1024*1024*5                        # optional
+#        time_file => 10                                 # optional
+#        restore => true                                 # optional
+#        temporary_directory => "/directory/pipeline_id" # optional - unique across pipelines
+#        upload_queue_size => 2                          # optional
+#        upload_workers_count => 1                       # optional
+#        rotation_strategy_val => "size_and_time"        # optional
+#        tags => []                                      # optional
+#        encoding => "none"                              # optional
+#        codec => "json_lines"                           # optional
 #      }
 #    }
 class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
@@ -251,7 +251,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
 
     # if the queue is full the calling thread will be used to upload
     temp_file.close # make sure the content is on disk
-    if temp_file.exists? && !temp_file.empty? # rubocop:disable GuardClause
+    unless temp_file.empty? # rubocop:disable GuardClause
       upload_options = []
       @uploader.upload_async(temp_file,
                              on_complete: method(:clean_temporary_file),
@@ -282,7 +282,7 @@ class LogStash::Outputs::LogstashAzureBlobOutput < LogStash::Outputs::Base
     @crash_uploader = Uploader.new(blob_container_resource, container_name, @logger, CRASH_RECOVERY_THREADPOOL)
 
     temp_folder_path = Pathname.new(@temporary_directory)
-    Dir.glob(::File.join(@temporary_directory, prefix, '*'))
+    Dir.glob(::File.join(@temporary_directory, "**/*"))
        .select { |file| ::File.file?(file) }
        .each do |file|
       temp_file = TemporaryFile.create_from_existing_file(file, temp_folder_path)
