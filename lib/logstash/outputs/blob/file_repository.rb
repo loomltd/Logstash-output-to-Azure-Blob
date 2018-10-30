@@ -50,6 +50,7 @@ module LogStash
         # class for initializing the repo manager
         class FactoryInitializer
           # initializes the class
+          include java.util.function.Function
           def initialize(tags, encoding, temporary_directory, stale_time)
             @tags = tags
             @encoding = encoding
