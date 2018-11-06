@@ -5,7 +5,11 @@ This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
 It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way.
 
+## Notice
 This plugin has been forked and modified from [tuffk/Logstash-output-to-Azure-Blob](https://github.com/tuffk/Logstash-output-to-Azure-Blob) through [loomltd/Logstash-output-to-Azure-Blob](https://github.com/loomltd/logstash-output-to-azure-blob)
+
+However, despite multiple fixes we still had issue with crashlooping in our Logstash containers, so we moved over to using the S3 output plugin through [Minio backed by Azure Blob Storage](https://www.minio.io/azure.html)
+
 ## Documentation
 
 ### How to install the plugin
